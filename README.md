@@ -1,6 +1,9 @@
-# Hotakus Useful Skills
-
-Claude Code 自定义技能集合——编码规范、游戏开发、嵌入式测试、文档撰写等领域的最佳实践。
+<div align="center">
+<strong>
+    <h1>Hotakus Useful Skills</h1>
+    Claude Code 自定义技能集合——编码规范、游戏开发、嵌入式测试、文档撰写等领域的最佳实践
+</strong>
+</div>
 
 ## 技能列表
 
