@@ -6,7 +6,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-9-orange.svg)]()
-[![Claude](https://img.shields.io/badge/Claude-Code-purple.svg)]()
+[![LLM](https://img.shields.io/badge/LLM-Ready-green.svg)]()
 </div>
 
 ## 技能列表
