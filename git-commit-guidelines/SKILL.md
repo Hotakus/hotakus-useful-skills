@@ -83,6 +83,21 @@ chore(deps): update lodash version
 - 推送命令统一为 `git push origin master`（或等效的 `git push`，前提是本地已跟踪 `origin/master`）。
 - 用户明确指定了其他分支名时，以用户指定为准。
 
+### 6.1 远程协议
+
+GitHub 推送优先使用 SSH，避免 HTTPS 环境下的连接不稳定：
+
+```bash
+# 检查当前远程协议
+git remote -v
+
+# 若为 HTTPS → 切为 SSH
+git remote set-url origin git@github.com:<user>/<repo>.git
+```
+
+- MUST 优先使用 SSH 远程（`git@github.com:...`）
+- HTTPS 仅作为 SSH 不可用时的备用方案
+
 ## 7. 自检要求
 
 输出前请自检，如出现违反以上规则的输出，重新输出。
