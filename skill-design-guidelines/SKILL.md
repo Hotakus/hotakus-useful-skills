@@ -2,6 +2,8 @@
 name: skill-design-guidelines
 description: Skill 设计指南——设计、编写、修改 OpenCode Skill 时的领域定义、结构规范、规则设计原则、写作风格与自检清单。确保 Skill 清晰、可执行、易维护。
 license: MIT
+metadata:
+  tags: skill-design, guidelines, opencode, metadata, structure
 ---
 
 # Skill 设计指南
@@ -88,6 +90,36 @@ Skill 开头应明确声明适用范围。反例和正例：
 | `写、修改、审查` | `使用、处理、进行` |
 | `提交、推送` | `操作、管理` |
 | `设计、编写` | `创建、制作` |
+
+### 3.3 `metadata` 字段
+
+YAML 头部必须包含 `metadata` 字段，用于机器可读的分类标签。
+
+**格式**：
+
+```yaml
+---
+name: your-skill-name
+description: ...
+license: MIT
+metadata:
+  tags: tag1, tag2, tag3
+---
+```
+
+**规则**：
+- `metadata.tags` 必须包含 3-5 个分类标签
+- 标签用小写英文，空格分隔
+- 标签应涵盖 Skill 的领域（如 `writing`）、核心概念（如 `de-formula`）、适用范围（如 `scriptwriting`）
+
+**示例**：
+
+```yaml
+metadata:
+  tags: writing, de-formula, negation, abstract-description
+```
+
+> `metadata` 不用于 LLM 的触发判断（那是 `description` 的职责），但用于工具链的索引、搜索和分类。
 
 ---
 
