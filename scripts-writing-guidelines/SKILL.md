@@ -18,12 +18,12 @@ metadata:
 
 本 Skill 提供可验证的规则和修复模板。
 
-## 2. 规则文件
+## 2. **（重要）规则文件**
 
 | 规则 | 文件 | 说明 |
 |------|------|------|
-| 去八股 | [rules/de-formula.md](rules/de-formula.md) | 禁止否定前置句式 + 抽象描写 |
-| 角色参与 | [rules/character-participation.md](rules/character-participation.md) | 情感转折必须有交互，禁止沉默旁观 |
+| （必须读取并遵守）去八股 | [rules/de-formula.md](rules/de-formula.md) | 禁止否定前置句式 + 抽象描写 |
+| （必须读取并遵守）角色参与 | [rules/character-participation.md](rules/character-participation.md) | 情感转折必须有交互，禁止沉默旁观 |
 
 ## 3. 自检要求
 
