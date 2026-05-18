@@ -2,6 +2,8 @@
 name: c-coding-guidelines
 description: C 语言编码规范——写 C 代码(.c/.h)、嵌入式 C 项目的文件组织、命名约定、函数设计、宏定义、ISR 约束、static/const 正确性等编码准则。适用于 STM32、ESP32、ARM Cortex-M 等平台。
 license: MIT
+metadata:
+  tags: c, embedded, coding-style, naming, formatting
 ---
 
 # C 语言编码规范
@@ -506,3 +508,9 @@ err_t fn_init(struct dev_t *dev, const cfg_t *cfg) {
 ## 14. 自检要求
 
 输出前请自检，如出现违反以上规则的输出，重新输出。
+
+## 15. 架构设计哲学
+
+编写或审查涉及模块划分、接口设计、分层架构的 C 代码时，加载 [./rules/architecture.md](./rules/architecture.md) 获取架构级设计准则。
+
+---
