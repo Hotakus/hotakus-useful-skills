@@ -761,3 +761,4 @@ godot --path ./my-game -s addons/gut/gut_cmdln.gd -gdir=res://tests -gexit
 - Pixel Font Rendering: [./rules/fonts.md](./rules/fonts.md)
 - Window Management: [./rules/window-management.md](./rules/window-management.md)
 - Camera2D jitter prevention: [./rules/camera2d.md](./rules/camera2d.md)
+- Pixel art design constraints: [./rules/pixel-art-design.md](./rules/pixel-art-design.md)
