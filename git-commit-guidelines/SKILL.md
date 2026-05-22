@@ -25,7 +25,7 @@ type(scope): description
 其中：
 - **type**：修改类型，必须从下列清单中选择：`feat`、`fix`、`refactor`、`docs`、`style`、`test`、`chore`、`perf`、`ci`。
 - **scope**：影响范围，用简短英文单词说明受影响的模块、文件或组件名（若无法明确，可省略，但括号必须保留）。
-- **description**：用一句简明的英文概括本批次的修改内容（一句话总结，全部小写，不加句号）。
+- **description**：用一句简明中文概括本批次的修改内容（一句话总结，不加句号）。
 
 如果某个修改是删除文件，输出 `fix(scope): remove file_name` 即可。
 
@@ -38,9 +38,9 @@ type(scope): description
 示例输出格式（仅用于说明格式，真实回复中不应出现示例）：
 
 ```text
-feat(auth): add login endpoint
-fix(parser): handle empty input error
-chore(deps): update lodash version
+feat(auth): 添加登录接口
+fix(parser): 处理空输入报错
+chore(deps): 更新 lodash 版本
 ```
 
 ## 4. 注意事项
