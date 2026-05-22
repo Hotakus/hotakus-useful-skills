@@ -5,7 +5,7 @@
 </strong>
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-10-orange.svg)]()
+[![Skills](https://img.shields.io/badge/skills-11-orange.svg)]()
 [![LLM](https://img.shields.io/badge/LLM-Ready-green.svg)]()
 </div>
 
@@ -22,6 +22,7 @@
 | **karpathy-guidelines** | LLM 编码防错准则——简单优先、外科手术式修改、可验证目标 |
 | **math-formula-guidelines** | 数学公式编写——LaTeX 写法、GitHub 渲染兼容 |
 | **reference-first-coding** | 先查参考再写代码——API/库/框架/算法的官方文档查阅、代码示例搜索、交叉验证工作流 |
+| **scripts-writing-guidelines** | 剧本写作规范——去八股准则、角色参与、情感转折交互 |
 | **skill-design-guidelines** | Skill 设计指南——领域定义、规则设计、自检清单 |
 
 ## 安装
