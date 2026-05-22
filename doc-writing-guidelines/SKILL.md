@@ -2,6 +2,8 @@
 name: doc-writing-guidelines
 description: 文档撰写规范——写文档、README、技术文档、项目文档时的结构、排版、语言风格准则。适用于嵌入式 C 项目及通用技术文档。
 license: MIT
+metadata:
+  tags: documentation, writing, technical-writing, markdown, formatting
 ---
 
 # 文档撰写规范

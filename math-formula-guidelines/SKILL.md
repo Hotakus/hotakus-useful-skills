@@ -2,6 +2,8 @@
 name: math-formula-guidelines
 description: 数学公式编写规范——写数学公式、LaTeX 公式、Markdown 数学表达式时的正确写法，避免 GitHub 渲染兼容性问题。使用 $...$ 和 $$...$$ 定界符。
 license: MIT
+metadata:
+  tags: math, latex, markdown, formula, github-markdown
 ---
 
 # GitHub Markdown 数学公式编写规范

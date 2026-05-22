@@ -2,6 +2,8 @@
 name: git-commit-guidelines
 description: Git 提交与推送规范——提交(commit)、推送(push)、上传代码时的拆分策略、Conventional Commits 提交格式、分支选择、分步提交流程。防止破坏性修改。
 license: MIT
+metadata:
+  tags: git, version-control, commit, workflow, conventional-commits
 ---
 
 # Git 提交规范

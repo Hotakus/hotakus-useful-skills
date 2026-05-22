@@ -2,6 +2,8 @@
 name: embedded-testing-guidelines
 description: 嵌入式测试指南——写测试、单元测试、集成测试、硬件在环测试时的分层策略、测试接缝识别、Mock 策略、框架选型、离板与片上测试实践。覆盖 ESP32、STM32、通用 ARM Cortex-M 等平台。
 license: MIT
+metadata:
+  tags: testing, embedded, c, unit-testing, integration-testing
 ---
 
 # 嵌入式测试指南

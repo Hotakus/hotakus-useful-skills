@@ -2,6 +2,8 @@
 name: karpathy-guidelines
 description: 减少常见 LLM 编码错误的行为准则。在编写、审查或重构代码时使用，以避免过度复杂化、进行外科手术式修改、明确假设并定义可验证的成功标准。
 license: MIT
+metadata:
+  tags: coding-style, best-practices, anti-patterns, code-quality, llm
 ---
 
 # Karpathy 编码准则

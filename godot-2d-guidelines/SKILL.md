@@ -2,6 +2,7 @@
 name: godot-2d-guidelines
 description: Godot 4.x 2D 游戏开发规范——写 GDScript 代码、组织 2D 场景、配置物理与碰撞、处理输入、
              管理 TileMap/Camera2D/AnimationPlayer、搭建项目结构。适用于 Godot 4.3+ 2D 项目。
+license: MIT
 metadata:
   tags: godot, gdscript, 2d, game-development, godot4
 ---

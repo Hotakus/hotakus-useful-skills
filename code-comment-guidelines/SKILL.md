@@ -2,6 +2,8 @@
 name: code-comment-guidelines
 description: 代码注释规范——写注释、修改注释、添加注释时的书写准则。不得在注释中透露修改意图、步骤或元信息，注释如初写，只描述功能与设计理由。
 license: MIT
+metadata:
+  tags: commenting, documentation, coding-style, code-quality
 ---
 
 # 代码注释规范
