@@ -1,6 +1,6 @@
 ---
 name: skill-design-guidelines
-description: Skill 设计指南——设计、编写、修改 OpenCode Skill 时的领域定义、结构规范、规则设计原则、写作风格与自检清单。确保 Skill 清晰、可执行、易维护。
+description: Skill 设计指南——编辑 SKILL.md 文件、新建 Skill、修改现有 Skill 的规则、结构、示例时的领域定义、触发条件设计、规则设计原则、写作风格与自检清单。确保 Skill 清晰、可执行、易维护。
 license: MIT
 metadata:
   tags: skill-design, guidelines, opencode, metadata, structure
