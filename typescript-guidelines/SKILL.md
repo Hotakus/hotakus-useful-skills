@@ -1,6 +1,6 @@
 ---
 name: typescript-guidelines
-description: TypeScript 编码规范——写 TypeScript 代码时遵循的类型系统使用、strict 配置基线、模块组织、命名约定和编码准则。适用于 TS 库、Web 前后端、Node.js 服务端及任意使用 TypeScript 的项目。
+description: TypeScript 编码规范——写 TypeScript 代码时遵循的类型系统使用、strict 配置基线、模块组织、命名约定和编码准则。适用于 TS 库、Web 前后端、Node.js 服务端的 TypeScript 编码场景。
 license: MIT
 metadata:
   tags: typescript, coding-standards, type-safety, strict-mode, module-organization
@@ -102,12 +102,13 @@ if (x !== undefined) {
 import { useState } from "react";            // 运行时保留
 import type { ReactNode } from "react";      // 编译时删除
 import { type FC, type PropsWithChildren } from "react"; // 仅删除类型
+import { useState, type FC } from "react";   // 混合导入合法：useState 保留，FC 删除
 ```
 
 **错误**：
 
 ```typescript
-import { useState, type FC } from "react";   // 混合导入，依赖编译器自动删除
+import { useState, FC } from "react";   // 未标 type，verbatimModuleSyntax 下 FC 被保留到运行时输出
 ```
 
 **命名空间禁令**：禁止使用 `namespace` 和 `module` 关键字组织代码。禁止使用 `import X = require(...)` 语法——统一使用 ESM `import`/`export`。
@@ -137,7 +138,7 @@ function greet(name: String): String {
 
 ### 3.2 `any` 的使用边界
 
-**禁止在生产代码中使用 `any`**。需要"任意类型"时使用 `unknown`，使用时必须通过类型守卫窄化。每条 `as any` 或 `// @ts-ignore` 必须在代码旁用注释说明理由。
+**禁止在生产代码中使用 `any`**。需要"任意类型"时使用 `unknown`，使用时必须通过类型守卫窄化。禁止使用 `// @ts-ignore`。需要抑制类型错误时使用 `// @ts-expect-error` 并附理由注释——错误消失时它会主动报错，防止过时抑制注释残留；`@ts-ignore` 不会在错误消失时报错，禁止使用。
 
 **正确**：
 
@@ -206,10 +207,10 @@ function identity<T>(value: T): T {
 **错误**：
 
 ```typescript
-function print<T>(value: T): void {
-  console.log("hello");
+function print<T>(value: string): void {
+  console.log(value);
 }
-// 泛型参数 T 未被使用
+// T 未出现在任何签名位置，是无意义的泛型参数
 ```
 
 复杂条件类型的替代方案：将复杂类型抽取为命名的工具类型，并添加 `/** */` 注释说明输入输出关系。
@@ -233,6 +234,54 @@ const palette = {
 } satisfies Record<string, string | number[]>;
 
 palette.green.startsWith("#"); // 类型推断为 string，有 .startsWith()
+```
+
+### 3.6 非空断言 `!`
+
+**禁止使用 `!` 非空断言操作符。** 用显式空值检查或类型守卫代替。
+
+理由：`!` 在编译时抑制了 `undefined` 检查，但运行时不会真正排除 `null`/`undefined`，是隐式逃逸。
+
+**正确**：
+
+```typescript
+const el = document.querySelector(".btn");
+if (el !== null) {
+  el.addEventListener("click", handleClick);
+}
+```
+
+**错误**：
+
+```typescript
+const el = document.querySelector(".btn");
+el!.addEventListener("click", handleClick);  // 运行时 el 仍可能为 null
+```
+
+### 3.7 `readonly` 修饰符
+
+**不会被重新赋值的类属性和参数用 `readonly` 标记。**
+
+理由：`readonly` 让编译器捕获意外变更，是类型安全从"值正确"延伸到"可变性正确"的环节。
+
+**正确**：
+
+```typescript
+class Config {
+  constructor(private readonly apiKey: string) {}
+}
+
+function process(data: readonly string[]) {
+  // data 不可变，意图明确
+}
+```
+
+**错误**：
+
+```typescript
+class Config {
+  constructor(private apiKey: string) {}  // 不会被重新赋值却不标 readonly
+}
 ```
 
 ## 4. 函数与类
@@ -294,8 +343,8 @@ function format(input: string | number): string {
 **错误**：
 
 ```typescript
-function format(input: number): string;    // 通用签名在前
-function format(input: string): string;    // 具体签名在后 —— 重载顺序错误
+function format(input: string | number): string;  // 联合（通用）在前 —— 永远先匹配它
+function format(input: string): string;           // 具体签名永远不可达
 function format(input: string | number): string {
   return String(input);
 }
@@ -332,11 +381,11 @@ enum HttpStatus {
 // 仅在需要反向映射（如 200 → "Ok"）时使用 enum
 ```
 
-## 6. 桌面端 IPC 类型安全（Tauri 场景）
+## 6. 外部 IPC/RPC 调用的类型安全
 
-> **适用场景**：此节仅针对 Tauri 桌面应用的前端 TypeScript 代码。纯 Web 项目可跳过本节。
+> **适用场景**：前端通过 `invoke`/`ipcRenderer`/WebSocket RPC 等方式调用外部运行时时，必须为返回值定义类型接口。本节以 Tauri `invoke` 为代表示例，Electron/WebSocket 场景同理。Tauri 命令系统架构、API 路径、命名映射见 `tauri-guidelines`。
 
-在 Tauri 等桌面框架中，前端 TypeScript 代码需要与 Rust 后端通过 `invoke` 通信。**必须为每个 invoke 调用定义精确的返回类型。**
+在 Tauri 等桌面框架中，前端 TypeScript 代码需要与 Rust 后端通过 `invoke` 通信。**必须为每个外部调用定义精确的返回类型。**
 
 **正确**：
 
@@ -398,7 +447,7 @@ const numbers = [1, 2, 3]; // 推断为 number[]
 const name: string = "Alice"; // 多余的显式标注
 ```
 
-需要显式标注的场景：函数参数、类的公开 API、导出函数的返回值。
+需要显式标注的场景：函数参数、类的公开 API、导出函数的返回值。非导出函数的返回值在涉及类型窄化或契约约束时也应标注。
 
 ## 8. 快速参考
 
@@ -411,18 +460,32 @@ const name: string = "Alice"; // 多余的显式标注
 | 函数声明优先 | `function foo(){}` 非 `const foo = ()=>{}` | 回调/箭头函数场景 |
 | `satisfies` 替代双重标注 | 验证类型但不改变推断 | TS 4.9- 不支持 |
 
-## 9. 禁止事项
+## 9. typescript-eslint 联动
+
+tsconfig 的 `strict` 是编译器层防线，lint 层由 `typescript-eslint` 补充。推荐启用 `recommended` 配置，关键规则：
+
+| 规则 | 作用 | 与本规范关系 |
+|------|------|-------------|
+| `no-explicit-any` | 禁止裸 `any` | 落实第 3.2 节 |
+| `prefer-ts-expect-error` | 强制用 `@ts-expect-error` | 落实第 3.2 节 |
+| `no-non-null-assertion` | 禁止 `!` | 落实第 3.6 节 |
+| `no-namespace` | 禁止 `namespace` | 落实第 10 节 |
+| `no-unnecessary-type-parameters` | 检测无意义泛型 | 落实第 3.4 节 |
+| `consistent-type-definitions` | `interface` vs `type` 一致性 | 落实第 3.3 节 |
+
+**来源**：[typescript-eslint recommended 配置](https://typescript-eslint.io/linting/configs/#recommended)
+
+## 10. 禁止事项
 
 - 禁止使用 `var` 声明变量
 - 禁止使用 `namespace` 组织代码
 - 禁止使用 `any` 作为生产代码类型
 - 禁止定义未使用类型参数的泛型
 - 禁止使用装箱类型（`String`、`Number`、`Boolean`、`Symbol`、`Object`）
-- 禁止在条件循环中调用 Hooks（虽然此条对 TS 通用）
-- 禁止 `// @ts-ignore` 不加理由注释
+- 禁止使用 `// @ts-ignore`，改用 `// @ts-expect-error` 并附理由
 - 禁止嵌套条件类型超过 2 层
 
-## 10. 自检要求
+## 11. 自检要求
 
 输出 TypeScript 代码或配置前，逐项检查：
 
@@ -433,4 +496,4 @@ const name: string = "Alice"; // 多余的显式标注
 - [ ] `as const` 替代了枚举？或枚举有正当理由（双向映射需求）？
 - [ ] 条件类型嵌套不超过 2 层？
 - [ ] 没有使用 `namespace`、`var`、装箱类型？
-- [ ] 所有 `// @ts-ignore` 有理由注释？没有被 `// @ts-expect-error` 误用？
+- [ ] 抑制类型错误用 `// @ts-expect-error`（非 `@ts-ignore`）并附理由？错误消失后能被及时清理？
