@@ -272,6 +272,55 @@ websearch_web_search_exa(query="xxx-utils npm library documentation")
 - 场景 B：用户问"怎么实现 X" → 查官方文档 + 1 个社区实现
 - 场景 C：用户问"这个 API 怎么用" → 查官方文档 + 1 个真实项目示例
 
+### 5.4 GitHub Issue 调研规范
+
+调研 GitHub Issue（回答已知问题、讨论、设计决策）时，禁止只凭标题或搜索结果摘要引用，按以下流程核实：
+
+**5.4.1 读取 body 与全部 comments**
+
+使用 `gh issue view <n> --json body,comments`（或 `gh api`）读取正文与全部评论，重点阅读维护者/自动代理的关闭说明与修复 commit 证据。引用时必须区分「完整读过 body+comments」与「仅标题/搜索结果」两种深度，不得混同。
+
+**5.4.2 核实 closed 状态的关闭原因**
+
+closed ≠ 已解决。通过 timeline 查询关闭事件（`gh api repos/<owner>/<repo>/issues/<n>/timeline`），区分三种情况：
+
+- **fixed**：关闭说明含修复 commit（形如 `fe91698`），须验证 commit 存在且确实对应问题
+- **duplicate**：指向另一 issue，必须追踪原 issue 核实
+- **wontfix / 其他**：未解决，引用时如实说明
+
+**5.4.3 默认 3 个月时效窗口**
+
+引用 issue 的创建与讨论时间应在 3 个月内；超过窗口的标注时效风险（如「创建于 X 月，注意时效」）。用户明确指定时效窗口时以用户要求为准。
+
+**5.4.4 追踪关闭后的 cross-reference**
+
+closed 后的 cross-referenced 事件可能是新问题、回归或无关引用——逐条判断，closed 不代表问题永不复发。若发现相关的新 issue，一并纳入调研。
+
+**5.4.5 空评论不构成停止信号**
+
+读取 issue 时 `comments` 为空不代表无后续活动。必须查询 timeline 与 `closedByPullRequestsReferences`，以发现 bot 自动关联、cross-reference、状态变更等不体现在评论中的事件。
+
+**5.4.6 禁止以查询字段边界代替来源边界**
+
+`gh issue view --json body,comments` 只返回正文与评论两个字段，不得据此判定「已读完 issue」。读取来源前先定义「完整视图」所需字段清单，逐项获取后再下结论。
+
+**正确**：
+
+```bash
+# 完整读取 body + 全部评论
+gh issue view <issue-number> --json body,comments
+# 核对关闭原因与修复 commit
+gh api repos/<owner>/<repo>/issues/<issue-number>/timeline \
+  --jq '.[] | select(.event == "closed")'
+```
+
+**错误**：
+
+```bash
+# 只取标题即引用——无法判断 closed 是 fixed、duplicate 还是 wontfix
+gh issue view <issue-number> --json title
+```
+
 ## 6. 引用信息的整合与输出规范
 
 ### 6.1 来源标注
@@ -364,7 +413,17 @@ context7 的缓存滞后窗口取决于库的流行度，你在使用时必须�
 | 用户问"刚发布的新特性" | 高 | **跳过 context7**，直接查官方博客/Changelog |
 | 库最近有重大版本更新 | 高 | 手动触发 context7 refresh 或改用 webfetch |
 
-### 7.4 成本意识
+### 7.4 语境时效性（API/版本语义匹配）
+
+引用 issue/PR/文档作为**归因或证据**时，除检查时间新旧（§7.3）外，必须核实其**语义语境**与当前讨论对象匹配：
+
+1. **API 版本匹配**：issue 描述的 API（如 `registerLayer`）必须与当前讨论的版本一致；API 被重命名/移除后，旧 API 的 issue 不能作为新 API 行为的归因依据
+2. **分支/通道匹配**：issue 基于的分支（v2 / dev / next）与讨论对象一致——同一问题在不同通道行为可能不同
+3. **验证方法**：引用前读 issue 的 Environment 段（版本号 / API 调用示例）比对；必要时查当前分支源码确认该 API 仍存在
+
+**反例**：用描述旧 API（`registerLayer`）的 issue 归因新 API（`keymap.layer`）的命令不显示问题——API 语境不匹配，归因错误。
+
+### 7.5 成本意识
 
 - 能用 1 次查询解决的问题，不用 3 次
 - 先评估问题复杂度：简单 API 用法 → 1 次官方文档查询即可；复杂系统设计 → 需要多源追踪
@@ -395,6 +454,12 @@ context7 的缓存滞后窗口取决于库的流行度，你在使用时必须�
 - [ ] 引用信息是否经过**分析整合**，而非原样粘贴？
 - [ ] 查询数量是否在合理范围（2-4 个为宜，不超过 6 个）？
 - [ ] 是否避免了死循环（无重复 URL、无导航/社交链接追踪）？
+- [ ] 引用的 GitHub Issue 是否读取了 body + 全部 comments（非仅标题）？
+- [ ] 引用的 closed issue 是否核实了关闭原因（fixed / duplicate / wontfix）与修复 commit？
+- [ ] 引用是否在 3 个月时效窗口内（超期已标注时效风险）？
+- [ ] 是否追踪了 closed 后的 cross-reference（新问题 / 回归 / 无关引用）？
+- [ ] 是否标注了每篇 issue 引用的查看深度（全文 / 标题级）？
+- [ ] 引用 issue 作为归因/证据时，是否核实了其 API 语境与当前版本匹配（旧 API issue 未误归因新 API）？
 - [ ] **context7 专项检查**：
   - [ ] 是否检查了 resolve-library-id 返回的 Code Snippets 数量？
   - [ ] Code Snippets < 100 时是否降级到了 websearch？
