@@ -1,6 +1,6 @@
 ---
 name: git-commit-guidelines
-description: Git 提交与推送规范——提交(commit)、推送(push)、上传代码时的拆分策略、Conventional Commits 提交格式、分支选择、分步提交流程。防止破坏性修改。
+description: Git 提交与推送规范——提交(commit)、修改提交信息(amend)、推送(push)、上传代码时的拆分策略、Conventional Commits 提交格式、分支选择、分步提交流程。防止破坏性修改。
 license: MIT
 metadata:
   tags: git, version-control, commit, workflow, conventional-commits
@@ -10,6 +10,8 @@ metadata:
 
 在进行代码修改和版本提交时，必须严格遵循以下准则，确保提交历史清晰、可追溯、易于回滚。
 
+**前置条件**：执行任何 git 写操作（commit / amend / push / tag）前，必须先完整阅读本规范并逐条对照。
+
 ## 1. 提交拆分原则
 
 将所有修改拆分成有意义的逻辑批次，每个批次只实现一个明确的修改意图。
@@ -18,11 +20,29 @@ metadata:
 
 ## 2. 提交标题格式
 
-每个批次输出一行标题，格式为：
+每个 commit 只允许**一行标题**，格式为：
 
 ```
 type(scope): description
 ```
+
+禁止添加 body（正文、详细说明、列表）。
+
+**正确**：
+
+```text
+feat(auth): 添加登录接口
+```
+
+**错误**：
+
+```text
+feat(auth): 添加登录接口
+
+- 新增 refresh token 轮换
+- 补充错误码映射
+```
+（多行 body 违反单行规则，禁止）
 
 其中：
 - **type**：修改类型，必须从下列清单中选择：`feat`、`fix`、`refactor`、`docs`、`style`、`test`、`chore`、`perf`、`ci`。
@@ -30,6 +50,14 @@ type(scope): description
 - **description**：用一句简明中文概括本批次的修改内容（一句话总结，不加句号）。
 
 如果某个修改是删除文件，输出 `fix(scope): remove file_name` 即可。
+
+### 2.1 修改提交信息（amend）
+
+`git commit --amend` 同样遵守单行标题规则。
+
+- 仅允许对**本地未推送**的 commit 使用 amend；已推送的禁止改写历史
+- amend 修改 message 时，标题格式与第 2 节一致，只写一行，禁止 body
+- amend 并入新改动时，确认新改动与 commit 意图一致；意图不同则拆为独立 commit
 
 ## 3. 输出规则
 
@@ -100,6 +128,32 @@ git remote set-url origin git@github.com:<user>/<repo>.git
 - MUST 优先使用 SSH 远程（`git@github.com:...`）
 - HTTPS 仅作为 SSH 不可用时的备用方案
 
+### 6.2 Tag 管理
+
+`npm version` 或 `git tag` 创建的 tag 是**静态锚点**——它固定在创建时的 commit 上，不会自动跟随后续 `git commit` 向前移动。当 tag 创建后又追加了修复性提交（如 CI 配置修正、lockfile 重建等），重推 tag 前必须执行两步验证：
+
+```bash
+# 1. 确认 tag 是否指向最新 commit
+git log --oneline -1 HEAD
+git log --oneline -1 <tag>
+
+# 2. 若不一致 → 将 tag 移动到 HEAD，再推送
+git tag -f <tag>
+git push origin :<tag>      # 删除远端旧 tag
+git push origin <tag>       # 推送新 tag
+```
+
+- MUST 在重推 tag 前先运行 `git log --oneline <tag>` 比对 HEAD，确认 tag 指向最新 commit
+- MUST 用 `git tag -f` 更新本地 tag，再删远端、重推，确保远端 tag 与本地一致
+- 禁止直接 `git push origin :<tag> && git push origin <tag>` 而不先检查 tag 指向的 commit
+
 ## 7. 自检要求
 
-输出前请自检，如出现违反以上规则的输出，重新输出。
+输出前逐项核查：
+
+- [ ] 执行 git 写操作前是否完整阅读了本规范？
+- [ ] 标题格式为 `type(scope): description`，一句简明中文、不加句号？
+- [ ] commit 信息只包含一行标题，无 body？
+- [ ] 每个 commit 只实现一个明确修改意图？
+- [ ] amend 仅用于本地未推送 commit，且标题符合单行规则？
+- [ ] 推送目标分支为用户指定分支（未指定则为 master）？
