@@ -91,19 +91,41 @@ gh pr create --title "feat(auth): 新增登录接口" --body-file "$TMP/pr-body.
 gh pr create --body "描述含 \"引号\" 导致失败"
 ```
 
-### 2.5 外部引用链接格式
+### 2.5 问题归属与引用关联
 
-PR/Issue 描述引用**其他仓库**的 issue/PR 时，使用 `https://redirect.github.com/<owner>/<repo>/issues/<number>` 格式，禁止使用 `https://github.com/...` 直链。
+**先判断归属，再决定是否引用。**
 
-理由：`github.com` 直链会被 GitHub 自动生成 backlink（cross-reference），在被引用方的 issue/PR 时间线显示「mentioned this issue in ...」——已产生的 backlink **无法通过编辑源内容移除**（只能删除源资源或联系 support）。`redirect.github.com` 链接可正常点击跳转，但不产生 backlink（官方文档支持的方式，dependabot/Renovate 亦用此法）。同仓库引用（`#number`）不适用此规则。
+在 PR/Issue 中描述问题前，先确定它属于谁：是目标 PR/issue 引入的，还是既有的 / 仓库自身的。**不属于目标对象的问题，不得与其关联**——不写 `#NN`、不加链接，措辞上也不挂靠。
+
+理由：错误归属会误导责任方，并在无关的 issue/PR 时间线制造噪音与通知。
+
+需要交代来源时，用中性表述（如「在 X 环境实测时发现」），不引用无关的 PR/issue。
+
+确需引用他人的 issue/PR 时，按意图选择写法：
+
+| 意图 | 写法 |
+|------|------|
+| 主动关联（`Fixes #NN`、需要对方知晓） | `#NN`（同仓库）或 `https://github.com/...` |
+| 仅说明来源、不产生关联 | `https://redirect.github.com/<owner>/<repo>/issues/<n>`，或纯文字不带链接 |
+
+理由：`#NN` 与 `github.com` 直链都会让 GitHub 在被引用方的 issue/PR 时间线生成 cross-reference / backlink——已产生的关联**无法通过编辑源内容移除**（只能删除源资源）。`redirect.github.com` 链接可正常跳转，但不产生 backlink。**同仓库的 `#NN` 同样会产生 cross-reference**。
 
 **正确**：
+
+```markdown
+Fixes #123
+```
 
 ```markdown
 参考官方 issue [37276](https://redirect.github.com/example/opencode/issues/37276)
 ```
 
 **错误**：
+
+```markdown
+# 问题属于插件自身的适配器，却写成某 PR 的发现 → 误导归属，并产生不可撤回的关联
+本问题由 PR #123 的实测发现
+```
 
 ```markdown
 # github.com 直链 → 产生 backlink，且无法撤回
@@ -206,6 +228,8 @@ Issue 必须包含：复现步骤（编号列表）、期望行为与实际行�
 | 合并方式 | 询问用户，说明 merge/squash/rebase 差异 |
 | Issue 复现 | 编号步骤 + 期望/实际行为 + 环境信息 |
 | 依赖版本 | 先查 CI 环境矩阵，匹配实际 node 版本 |
+| 问题归属 | 不属于目标对象的问题不与其关联或挂靠 |
+| 引用他人 PR/issue | 主动关联用 `#NN`；仅说明来源用 redirect 或纯文字 |
 
 ## 8. 禁止事项
 
@@ -218,6 +242,8 @@ Issue 必须包含：复现步骤（编号列表）、期望行为与实际行�
 - 禁止省略 Issue 的环境信息与复现步骤
 - 禁止在 PR 描述中遗漏验证项或夸大验证结果
 - 禁止用 PowerShell `Set-Content` / `Out-File` 写含中文的 PR/Issue body 文件（乱码污染远端，无法撤回）
+- 禁止把不属于目标 PR/issue 的问题与其关联或在措辞上挂靠
+- 禁止在需要避免关联时使用 `#NN` 或 `github.com` 直链（同仓库 `#NN` 同样产生 cross-reference）
 
 ## 9. 自检要求
 
@@ -227,7 +253,8 @@ Issue 必须包含：复现步骤（编号列表）、期望行为与实际行�
 - [ ] PR 描述是否只写了功能与验证，不含实现细节？
 - [ ] 验证项是否真实可复现，无夸大？
 - [ ] 描述含特殊字符（空格、引号、反引号）时是否使用了 `--body-file` 而非 `--body`？
-- [ ] 引用其他仓库 issue/PR 时是否使用了 `redirect.github.com` 而非 `github.com` 直链？
+- [ ] 描述的问题归属是否正确——不属于目标对象的问题是否未被关联或挂靠？
+- [ ] 引用他人 PR/issue 时是否按意图选择写法（主动关联用 `#NN`，仅说明来源用 `redirect.github.com` 或纯文字）？
 - [ ] 推送、合并、描述更新前是否已展示方案并等待批准？
 - [ ] 合并方式是否由用户决定？
 - [ ] Issue 是否包含复现步骤、期望/实际行为、环境信息？
